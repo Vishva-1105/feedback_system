@@ -14,11 +14,25 @@ const getBaseURL = () => {
 // Create axios instance with base configuration
 const api = axios.create({
   baseURL: getBaseURL(),
-  timeout: 10000,
+  timeout: 30000, // Increased timeout to 30 seconds
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Retry logic for failed requests
+const retryRequest = async (fn, retries = 2) => {
+  try {
+    return await fn();
+  } catch (error) {
+    if (retries > 0 && (error.code === 'ERR_NETWORK' || error.message.includes('Network Error'))) {
+      console.log(`Retrying request... (${retries} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return retryRequest(fn, retries - 1);
+    }
+    throw error;
+  }
+};
 
 // Request interceptor to add logging
 api.interceptors.request.use(
@@ -58,21 +72,27 @@ api.interceptors.response.use(
 export const feedbackAPI = {
   // Submit new feedback
   submitFeedback: async (feedbackData) => {
-    const response = await api.post('/', feedbackData);
-    return response.data;
+    return retryRequest(async () => {
+      const response = await api.post('/', feedbackData);
+      return response.data;
+    });
   },
 
   // Get all feedbacks with optional rating filter
   getFeedbacks: async (ratingFilter = null) => {
-    const params = ratingFilter ? { rating: ratingFilter.join(',') } : {};
-    const response = await api.get('/', { params });
-    return response.data;
+    return retryRequest(async () => {
+      const params = ratingFilter ? { rating: ratingFilter.join(',') } : {};
+      const response = await api.get('/', { params });
+      return response.data;
+    });
   },
 
   // Get feedback statistics
   getStats: async () => {
-    const response = await api.get('/stats');
-    return response.data;
+    return retryRequest(async () => {
+      const response = await api.get('/stats');
+      return response.data;
+    });
   },
 };
 
