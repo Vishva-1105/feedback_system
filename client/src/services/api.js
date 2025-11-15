@@ -39,7 +39,17 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error('API Response Error:', error.response?.data || error.message);
+    console.error('API Response Error:', error);
+    
+    // Better error messages for different scenarios
+    if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
+      console.error('Network error - backend may be down or CORS issue');
+    } else if (error.response?.status === 404) {
+      console.error('API endpoint not found - check backend URL');
+    } else if (error.response?.status === 500) {
+      console.error('Server error - check backend logs');
+    }
+    
     return Promise.reject(error);
   }
 );
