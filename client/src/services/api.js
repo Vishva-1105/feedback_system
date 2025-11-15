@@ -1,8 +1,19 @@
 import axios from 'axios';
 
+// Determine base URL based on environment
+const getBaseURL = () => {
+  if (import.meta.env.PROD) {
+    // Production: Use your Render backend URL
+    return 'https://your-backend-url.onrender.com/api/feedback';
+  } else {
+    // Development: Use Vite proxy
+    return '/api/feedback';
+  }
+};
+
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: '/api/feedback',
+  baseURL: getBaseURL(),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

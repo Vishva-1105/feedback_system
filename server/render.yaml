@@ -1,0 +1,13 @@
+services:
+  # Web Service
+  - type: web
+    name: feedback-dashboard-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    healthCheckPath: /api/feedback
+    
+  # MongoDB Atlas (you'll add this manually in Render dashboard)
+  # Go to Render dashboard -> New -> Database -> MongoDB
