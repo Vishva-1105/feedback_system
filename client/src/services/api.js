@@ -4,8 +4,7 @@ import axios from 'axios';
 const getBaseURL = () => {
   if (import.meta.env.PROD) {
     // Production: Use your actual Render backend URL
-    // Replace with your real backend URL from Render
-    return 'https://feedback-dashboard-api.onrender.com/api/feedback';
+    return 'https://feedback-system-1-1p21.onrender.com/api/feedback';
   } else {
     // Development: Use Vite proxy
     return '/api/feedback';
